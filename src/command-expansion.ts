@@ -117,8 +117,6 @@ export async function executeCommand(
   if (showCommand) {
     console.error(`+ ${expanded.fullCommand}`);
   }
-  
-  try {
 
   try {
     // Set up zx options
@@ -139,33 +137,33 @@ export async function executeCommand(
     Object.assign(process.env, env);
 
     // Execute the command using Node.js child_process for proper argument handling
-    const { spawn } = await import('child_process');
-    
+    const { spawn } = await import("child_process");
+
     // Use child_process spawn for proper argument handling
-    const childProcess = spawn(expanded.command, expanded.flags, { 
-      stdio: 'inherit',
-      shell: false 
+    const childProcess = spawn(expanded.command, expanded.flags, {
+      stdio: "inherit",
+      shell: false,
     });
-    
+
     // Wait for the process to complete
     const result = await new Promise<ExecutionResult>((resolve) => {
-      childProcess.on('close', (code) => {
+      childProcess.on("close", (code) => {
         resolve({
           success: code === 0,
           exitCode: code || 0,
-          stdout: '', // stdio: 'inherit' means we don't capture
-          stderr: '',
-          command: expanded.fullCommand
+          stdout: "", // stdio: 'inherit' means we don't capture
+          stderr: "",
+          command: expanded.fullCommand,
         });
       });
-      
-      childProcess.on('error', (error) => {
+
+      childProcess.on("error", (error) => {
         resolve({
           success: false,
           exitCode: 1,
-          stdout: '',
+          stdout: "",
           stderr: error.message,
-          command: expanded.fullCommand
+          command: expanded.fullCommand,
         });
       });
     });
