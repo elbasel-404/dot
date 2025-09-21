@@ -1,14 +1,46 @@
 {
-  "name": "dot",
-  "module": "index.ts",
+  "name": "shell-cmd-dot",
+  "version": "2.0.0",
+  "description": "Shell command dot notation system built with TypeScript and zx",
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "bin": {
+    "dot": "bin/dot",
+    "shell-dot": "bin/dot"
   },
-  "peerDependencies": {
+  "scripts": {
+    "build": "bun build src/cli.ts --outdir dist --target node --format esm && bun build src/index.ts --outdir dist --target node --format esm && bun build src/completion.ts --outdir dist --target node --format esm",
+    "build:cli": "bun build src/cli.ts --outdir dist --target node --format esm",
+    "build:completion": "bun build src/completion.ts --outdir dist --target node --format esm",
+    "dev": "bun --watch src/cli.ts",
+    "start": "bun dist/cli.js",
+    "clean": "rm -rf dist",
+    "setup-completion": "bun dist/completion.js",
+    "test": "bun test",
+    "dot": "bun dist/cli.js"
+  },
+  "keywords": [
+    "shell",
+    "cli",
+    "command",
+    "zx",
+    "typescript",
+    "dot-notation"
+  ],
+  "author": "Shell Command Enhancement System",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5"
   },
   "dependencies": {
+    "@types/commander": "^2.12.5",
+    "commander": "^14.0.1",
     "zx": "^8.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
   }
 }
