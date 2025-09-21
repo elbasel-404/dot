@@ -34,7 +34,7 @@ shell.cmd/
 ├── script.sh                    # Main entry point
 ├── lib/
 │   ├── command-mappings.zsh     # Command definitions
-│   ├── command-expansion.zsh    # Expansion logic  
+│   ├── command-expansion.zsh    # Expansion logic
 │   └── tab-completion.zsh       # Completion system
 └── README.md                    # This file
 ```
@@ -42,6 +42,7 @@ shell.cmd/
 ## 🎯 Usage Examples
 
 ### Basic Commands
+
 ```bash
 . ls.all          # List all files (including hidden)
 . ls.long         # Long listing format
@@ -50,39 +51,52 @@ shell.cmd/
 ```
 
 ### Chained Options
+
 ```bash
 . ls.all.long     # ls -a -l (all files, long format)
 . ls.human.color  # ls -lh --color (human sizes, colored)
 . ls.all.time.reverse  # ls -a -t -r (all files, by time, reversed)
+. ls.all.long.color.time.reverse  # ls -a -l --color -t -r (everything!)
 ```
 
-### Tab Completion
+### Modular Tab Completion
+
 ```bash
 ls.<TAB>          # Show all available options
 ls.a<TAB>         # Complete options starting with 'a'
-. ls.all.<TAB>    # Show additional options to chain
+ls.all.<TAB>      # Show remaining options (excludes 'all')
+ls.all.c<TAB>     # Complete to 'ls.all.color'
+ls.all.long.<TAB> # Show options excluding 'all' and 'long'
 ```
+
+The completion system intelligently:
+
+- 🚫 **Excludes already used options** from suggestions
+- 🔄 **Allows infinite chaining** of compatible options
+- 🎯 **Supports partial matching** at any level
+- 💡 **Provides contextual completions** based on current chain
 
 ## 🛠️ Available Commands
 
 ### ls (File Listing)
-| Notation | Flags | Description |
-|----------|-------|-------------|
-| `ls.all` | `-a` | Show all files including hidden (. and ..) |
-| `ls.almost` | `-A` | Show all files except . and .. |
-| `ls.hidden` | `-a` | Alias for ls.all |
-| `ls.long` | `-l` | Long listing format |
-| `ls.human` | `-lh` | Long format with human-readable sizes |
-| `ls.color` | `--color` | Colorized output |
-| `ls.size` | `-S` | Sort by file size (largest first) |
-| `ls.time` | `-t` | Sort by modification time (newest first) |
-| `ls.reverse` | `-r` | Reverse sort order |
+
+| Notation     | Flags     | Description                                |
+| ------------ | --------- | ------------------------------------------ |
+| `ls.all`     | `-a`      | Show all files including hidden (. and ..) |
+| `ls.almost`  | `-A`      | Show all files except . and ..             |
+| `ls.hidden`  | `-a`      | Alias for ls.all                           |
+| `ls.long`    | `-l`      | Long listing format                        |
+| `ls.human`   | `-lh`     | Long format with human-readable sizes      |
+| `ls.color`   | `--color` | Colorized output                           |
+| `ls.size`    | `-S`      | Sort by file size (largest first)          |
+| `ls.time`    | `-t`      | Sort by modification time (newest first)   |
+| `ls.reverse` | `-r`      | Reverse sort order                         |
 
 ## 🔧 System Commands
 
 ```bash
 help-dot          # Show comprehensive help
-dot-stats         # Show completion statistics  
+dot-stats         # Show completion statistics
 dot-version       # Show version information
 ```
 
@@ -91,24 +105,28 @@ dot-version       # Show version information
 ### Modules
 
 #### 1. Command Mappings (`lib/command-mappings.zsh`)
+
 - Defines the `CMD_MAP` associative array
 - Maps dot notation to command flags
 - Provides utility functions for querying mappings
 - Easy to extend with new commands
 
 #### 2. Command Expansion (`lib/command-expansion.zsh`)
+
 - Parses dot notation input
 - Expands options to command-line flags
 - Handles command execution
 - Comprehensive error handling
 
 #### 3. Tab Completion (`lib/tab-completion.zsh`)
+
 - Integrates with zsh completion system
 - Supports partial matching and chaining
 - Context-aware completions
 - Works with both direct commands and dot function
 
 #### 4. Main Script (`script.sh`)
+
 - Entry point and module loader
 - Defines the main `.` function
 - Provides help and utility commands
@@ -117,6 +135,7 @@ dot-version       # Show version information
 ## 🔨 Adding New Commands
 
 ### Step 1: Add to Command Mappings
+
 Edit `lib/command-mappings.zsh` and add to the `init_command_mappings()` function:
 
 ```bash
@@ -127,9 +146,11 @@ CMD_MAP[git.log]="log --oneline"
 ```
 
 ### Step 2: Update Completion (Optional)
+
 The completion system automatically discovers new mappings, but you can add custom logic in `lib/tab-completion.zsh` if needed.
 
 ### Step 3: Test
+
 ```bash
 source script.sh    # Reload the system
 . git.status        # Should work immediately

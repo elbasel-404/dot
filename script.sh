@@ -87,17 +87,24 @@ help-dot() {
 	echo "  . ls.all.long   →  ls -a -l"
 	echo "  . ls.human      →  ls -lh"
 	echo
+	echo "🔗 Advanced Chaining:"
+	echo "  . ls.all.long.color.time  →  ls -a -l --color -t"
+	echo "  Chain as many options as you want!"
+	echo
 	echo "Features:"
-	echo "  • Tab completion: Type 'ls.' and press TAB"
-	echo "  • Chained options: Combine multiple options with dots"
+	echo "  • Modular Tab Completion: Type 'ls.all.' and press TAB for remaining options"
+	echo "  • Intelligent Chaining: Already used options are automatically excluded"
+	echo "  • Partial Matching: Type 'ls.all.c' + TAB → 'ls.all.color'"
 	echo "  • Error validation: Unknown options are caught with suggestions"
 	echo
 	show_available_commands
 	echo
-	echo "Tab Completion Usage:"
-	echo "  ls.<TAB>         Show all ls options"
-	echo "  ls.a<TAB>        Complete options starting with 'a'"
-	echo "  . ls.all.<TAB>   Show additional options to chain"
+	echo "Tab Completion Examples:"
+	echo "  ls.<TAB>             Show all ls options"
+	echo "  ls.a<TAB>            Complete options starting with 'a'"
+	echo "  ls.all.<TAB>         Show remaining options to chain"
+	echo "  ls.all.c<TAB>        Complete to 'ls.all.color'"
+	echo "  ls.all.long.<TAB>    Show options excluding 'all' and 'long'"
 	echo
 	echo "System Commands:"
 	echo "  help-dot         Show this help"
