@@ -13,6 +13,7 @@
     "build": "bun build src/cli.ts --outdir dist --target node --format esm && bun build src/index.ts --outdir dist --target node --format esm && bun build src/completion.ts --outdir dist --target node --format esm",
     "build:cli": "bun build src/cli.ts --outdir dist --target node --format esm",
     "build:completion": "bun build src/completion.ts --outdir dist --target node --format esm",
+    "build:zsh": "bun compile-to-zsh.ts",
     "dev": "bun --watch src/cli.ts",
     "start": "bun dist/cli.js",
     "clean": "rm -rf dist",
@@ -32,10 +33,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "@types/commander": "^2.12.5",
+    "@types/node": "^24.5.2",
     "commander": "^14.0.1",
     "zx": "^8.8.3"
   },
