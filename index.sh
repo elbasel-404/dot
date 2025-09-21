@@ -99,12 +99,12 @@ help-dot() {
 	echo
 	show_available_commands
 	echo
-	echo "Tab Completion Examples:"
-	echo "  ls.<TAB>             Show all ls options"
-	echo "  ls.a<TAB>            Complete options starting with 'a'"
-	echo "  ls.all.<TAB>         Show remaining options to chain"
-	echo "  ls.all.c<TAB>        Complete to 'ls.all.color'"
-	echo "  ls.all.long.<TAB>    Show options excluding 'all' and 'long'"
+	echo "Clean Tab Completion Examples:"
+	echo "  ls.<TAB>             Shows: .all .almost .color .hidden .human .long etc."
+	echo "  ls.all.<TAB>         Shows: .almost .color .human .long .reverse etc."
+	echo "  ls.all.c<TAB>        Shows: .color"
+	echo "  ls.all.long.<TAB>    Shows: .almost .color .human .reverse etc."
+	echo "  (Completions show only .option instead of full chains)"
 	echo
 	echo "System Commands:"
 	echo "  help-dot         Show this help"

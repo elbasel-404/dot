@@ -40,9 +40,17 @@ _complete_dot_notation() {
 		completions=($(get_single_option_completions "$current_word"))
 	fi
 
-	# Return completions to zsh with no automatic space
+	# Return completions to zsh with clean display (showing only .option)
 	if ((${#completions[@]} > 0)); then
-		compadd -S '' -r "." -a completions
+		# Create display names that show only .option
+		local display_names=()
+		for completion in "${completions[@]}"; do
+			local option_name="${completion##*.}"
+			display_names+=(".${option_name}")
+		done
+
+		# Use -d to show clean display names while completing to full chains
+		compadd -S '' -r "." -d display_names -a completions
 	fi
 }
 
@@ -246,11 +254,15 @@ _completion_with_descriptions() {
 			fi
 		done
 
-		# Add completions with descriptions and no auto-space
-		local i
-		for ((i = 1; i <= ${#completions[@]}; i++)); do
-			compadd -S '' -r "." -d descriptions -X "Available options:" "${completions[i]}"
+		# Add completions with descriptions and clean display format
+		local display_names=()
+		for completion in "${completions[@]}"; do
+			local option_name="${completion##*.}"
+			display_names+=(".${option_name}")
 		done
+
+		# Use -d to show clean display names with descriptions
+		compadd -S '' -r "." -d display_names -X "Available options:" -a completions
 	fi
 }
 
@@ -270,10 +282,12 @@ setup_completion_bindings() {
 		compdef _direct_command_completion "$base_cmd"
 	done
 
-	# Note: Completions use -S '' -r "." to:
+	# Note: Completions use -S '' -r "." -d to:
 	# - Prevent automatic space insertion after completion (-S '')
 	# - Allow dots to remove suffix for seamless chaining (-r ".")
-	# This enables smooth chaining like: ls.all<TAB> -> ls.all.human -> ls.all.human.
+	# - Show clean display names (.option) while completing full chains (-d)
+	# This enables: ls.all<TAB> shows .color .human but completes to ls.all.color
+	# Result: Clean display + correct completion behavior
 }
 
 #

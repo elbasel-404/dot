@@ -65,22 +65,27 @@ The system provides **seamless chaining** - when you accept a completion with En
 
 ```bash
 # Workflow example:
-1. Type: ls.all<TAB>          # Shows: ls.all.almost, ls.all.color, etc.
-2. Select: ls.all.human       # Press ENTER - NO space added!
+1. Type: ls.all<TAB>          # Shows: .almost .color .human .long etc.
+2. Select: .human             # Press ENTER - NO space added!
 3. Continue: ls.all.human.    # Type dot immediately
-4. Tab again: <TAB>           # Shows remaining options
+4. Tab again: <TAB>           # Shows: .almost .color .long .size etc.
 5. Result: ls.all.human.color # Seamless chaining!
 ```
 
 **Completion Examples:**
 
+````bash
+**Clean Completion Display:**
 ```bash
-ls.<TAB>          # Show all available options
-ls.a<TAB>         # Complete options starting with 'a'
-ls.all.<TAB>      # Show remaining options (excludes 'all')
-ls.all.c<TAB>     # Complete to 'ls.all.color'
-ls.all.long.<TAB> # Show options excluding 'all' and 'long'
-```
+ls.<TAB>          # Shows: .all .almost .color .hidden .human .long .reverse .size .time
+ls.all.<TAB>      # Shows: .almost .color .hidden .human .long .reverse .size .time
+ls.all.c<TAB>     # Shows: .color
+ls.all.long.<TAB> # Shows: .almost .color .hidden .human .reverse .size .time
+````
+
+The completions now display **only the next option** (`.color`) instead of the full chain (`ls.all.hidden.color`), making them much cleaner and easier to read!
+
+````
 
 The completion system intelligently:
 
@@ -112,7 +117,7 @@ The completion system intelligently:
 help-dot          # Show comprehensive help
 dot-stats         # Show completion statistics
 dot-version       # Show version information
-```
+````
 
 ## 📚 Architecture Overview
 
