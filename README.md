@@ -59,7 +59,20 @@ shell.cmd/
 . ls.all.long.color.time.reverse  # ls -a -l --color -t -r (everything!)
 ```
 
-### Modular Tab Completion
+### Seamless Chaining with Tab Completion
+
+The system provides **seamless chaining** - when you accept a completion with Enter, no space is automatically added, allowing you to immediately continue with a dot:
+
+```bash
+# Workflow example:
+1. Type: ls.all<TAB>          # Shows: ls.all.almost, ls.all.color, etc.
+2. Select: ls.all.human       # Press ENTER - NO space added!
+3. Continue: ls.all.human.    # Type dot immediately
+4. Tab again: <TAB>           # Shows remaining options
+5. Result: ls.all.human.color # Seamless chaining!
+```
+
+**Completion Examples:**
 
 ```bash
 ls.<TAB>          # Show all available options
@@ -75,6 +88,7 @@ The completion system intelligently:
 - 🔄 **Allows infinite chaining** of compatible options
 - 🎯 **Supports partial matching** at any level
 - 💡 **Provides contextual completions** based on current chain
+- ⚡ **No automatic spaces** - accepting completions allows immediate chaining with dots
 
 ## 🛠️ Available Commands
 

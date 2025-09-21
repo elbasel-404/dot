@@ -40,9 +40,9 @@ _complete_dot_notation() {
 		completions=($(get_single_option_completions "$current_word"))
 	fi
 
-	# Return completions to zsh
+	# Return completions to zsh with no automatic space
 	if ((${#completions[@]} > 0)); then
-		compadd -a completions
+		compadd -S '' -r "." -a completions
 	fi
 }
 
@@ -246,10 +246,10 @@ _completion_with_descriptions() {
 			fi
 		done
 
-		# Add completions with descriptions
+		# Add completions with descriptions and no auto-space
 		local i
 		for ((i = 1; i <= ${#completions[@]}; i++)); do
-			compadd -d descriptions -X "Available options:" "${completions[i]}"
+			compadd -S '' -r "." -d descriptions -X "Available options:" "${completions[i]}"
 		done
 	fi
 }
@@ -269,6 +269,11 @@ setup_completion_bindings() {
 	for base_cmd in "${base_commands[@]}"; do
 		compdef _direct_command_completion "$base_cmd"
 	done
+
+	# Note: Completions use -S '' -r "." to:
+	# - Prevent automatic space insertion after completion (-S '')
+	# - Allow dots to remove suffix for seamless chaining (-r ".")
+	# This enables smooth chaining like: ls.all<TAB> -> ls.all.human -> ls.all.human.
 }
 
 #
