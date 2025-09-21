@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 
-// Chainable Command Shell
+// Chainable Command Shell with Tab Cycling
 // Usage: node shell.mjs or chmod +x shell.mjs && ./shell.mjs
 
 import { createInterface } from 'readline'
@@ -77,6 +77,12 @@ const commandChains = {
   'grep.recursive.ignore.case': 'grep -ri',
 }
 
+// Tab completion state
+let currentCompletions = []
+let completionIndex = -1
+let originalLine = ''
+let lastTabTime = 0
+
 // Get available completions for a partial command
 function getCompletions(partial) {
   const completions = []
@@ -99,6 +105,55 @@ function getCompletions(partial) {
   }
   
   return completions.sort()
+}
+
+// Enhanced tab completion with cycling
+function handleTabCompletion(line) {
+  const now = Date.now()
+  const isConsecutiveTab = now - lastTabTime < 500 // 500ms threshold for consecutive tabs
+  lastTabTime = now
+  
+  // Extract the command part (before first space)
+  const spaceIndex = line.indexOf(' ')
+  const commandPart = spaceIndex === -1 ? line : line.substring(0, spaceIndex)
+  const argsPart = spaceIndex === -1 ? '' : line.substring(spaceIndex)
+  
+  if (!isConsecutiveTab || originalLine !== commandPart) {
+    // First tab or different line - get new completions
+    originalLine = commandPart
+    currentCompletions = getCompletions(commandPart)
+    completionIndex = -1
+    
+    if (currentCompletions.length === 0) {
+      return [[], line]
+    }
+    
+    if (currentCompletions.length === 1) {
+      // Single completion - auto-complete it
+      const completed = currentCompletions[0] + argsPart
+      return [[], completed]
+    }
+  }
+  
+  if (currentCompletions.length > 1) {
+    // Multiple completions - cycle through them
+    completionIndex = (completionIndex + 1) % currentCompletions.length
+    const completed = currentCompletions[completionIndex] + argsPart
+    
+    // Show completion info
+    process.stdout.write('\r' + ' '.repeat(process.stdout.columns) + '\r') // Clear line
+    const prompt = getPrompt()
+    const completionInfo = chalk.gray(` (${completionIndex + 1}/${currentCompletions.length})`)
+    process.stdout.write(prompt + completed + completionInfo)
+    
+    // Move cursor back to end of actual command
+    const moveBack = completionInfo.length
+    process.stdout.write('\x1b[' + moveBack + 'D')
+    
+    return [[], completed]
+  }
+  
+  return [[], line]
 }
 
 // Expand a chainable command
@@ -167,11 +222,14 @@ function showHelp() {
   console.log('  help          - Show this help')
   console.log('  chains [cmd]  - Show available chains for a command')
   console.log('  exit/quit     - Exit the shell')
+  console.log('\nTab completion:')
+  console.log('  TAB           - Cycle through available completions')
+  console.log('  TAB TAB       - Continue cycling through options')
   console.log('\nExample chains:')
   console.log('  ls.all.color.long.human  →  ls -a --color=auto -l -h')
   console.log('  git.log.oneline          →  git log --oneline')
   console.log('  docker.ps.all            →  docker ps -a')
-  console.log('\nPress TAB for completions!')
+  console.log('\nTry typing "ls." and press TAB to cycle through options!')
 }
 
 // Show available chains for a base command
@@ -198,29 +256,43 @@ function showChains(baseCmd) {
   }
 }
 
-// Setup readline interface
-const rl = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  completer: (line) => {
-    const completions = getCompletions(line)
-    return [completions, line]
-  }
-})
-
 // Custom prompt
 function getPrompt() {
   const cwd = process.cwd().replace(process.env.HOME, '~')
   return chalk.green('⚡ ') + chalk.blue(cwd) + chalk.white(' $ ')
 }
 
+// Setup readline interface with custom tab handling
+const rl = createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  completer: handleTabCompletion,
+  tabSize: 4
+})
+
+// Handle special keys
+process.stdin.on('keypress', (str, key) => {
+  if (key && key.name !== 'tab') {
+    // Reset completion state on any non-tab key
+    currentCompletions = []
+    completionIndex = -1
+    originalLine = ''
+  }
+})
+
 // Main shell loop
 async function startShell() {
   console.log(chalk.cyan('🔗 Welcome to Chainable Command Shell!'))
-  console.log(chalk.gray('Type "help" for commands or "exit" to quit\n'))
+  console.log(chalk.gray('Type "help" for commands, "exit" to quit'))
+  console.log(chalk.gray('Press TAB to cycle through available completions\n'))
   
   const prompt = () => {
     rl.question(getPrompt(), async (input) => {
+      // Reset completion state after command execution
+      currentCompletions = []
+      completionIndex = -1
+      originalLine = ''
+      
       await executeCommand(input)
       prompt()
     })
@@ -232,7 +304,15 @@ async function startShell() {
 // Handle Ctrl+C
 rl.on('SIGINT', () => {
   console.log('\n' + chalk.yellow('Use "exit" or "quit" to leave the shell'))
+  currentCompletions = []
+  completionIndex = -1
+  originalLine = ''
 })
+
+// Enable keypress events
+if (process.stdin.isTTY) {
+  process.stdin.setRawMode(false)
+}
 
 // Start the shell
 startShell().catch(console.error)
